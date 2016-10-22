@@ -22,7 +22,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         // Do any additional setup after loading the view, typically from a nib.
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         fetchResults()
@@ -30,29 +30,30 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
 
     func fetchResults() {
-        let app = UIApplication.sharedApplication().delegate as! AppDelegate
+        let app = UIApplication.shared.delegate as! AppDelegate
         let context = app.managedObjectContext
-        let fetchRequests = NSFetchRequest(entityName: "Recipe")
+        
+        let fetchRequests = Recipe.fetchRequest()
         do {
-            let results = try context.executeFetchRequest(fetchRequests)
+            let results = try context.fetch(fetchRequests)
             self.recipes = results as! [Recipe]
         } catch let err as NSError{
             print(err.debugDescription)
         }
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        if let cell = tableView.dequeueReusableCellWithIdentifier("cell") as? RecipeCell {
-            cell.configCell(recipes[indexPath.row])
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as? RecipeCell {
+            cell.configCell(recipe: recipes[indexPath.row])
             return cell
         } else {
             let cell = RecipeCell()
-            cell.configCell(recipes[indexPath.row])
+            cell.configCell(recipe: recipes[indexPath.row])
             return cell
         }
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return recipes.count
     }
     

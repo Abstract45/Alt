@@ -29,31 +29,32 @@ class CreateRecipeVC: UIViewController, UIImagePickerControllerDelegate, UINavig
         recipeImg.clipsToBounds = true
     }
     
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage, editingInfo: [String : AnyObject]?) {
-        imagePicker.dismissViewControllerAnimated(true, completion: nil)
-        recipeImg.image = image
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        let selectedImage = info[UIImagePickerControllerOriginalImage] as! UIImage
+        recipeImg.image = selectedImage
+        imagePicker.dismiss(animated: true, completion: nil)
     }
     
     @IBAction func addImage(sender:AnyObject!) {
-        presentViewController(imagePicker, animated:true,completion:nil)
+        present(imagePicker, animated:true,completion:nil)
     }
     @IBAction func createRecipe(sender:AnyObject!) {
-        if let title = recipeTitle.text where title != "" {
-            let app = UIApplication.sharedApplication().delegate as! AppDelegate
+        if let title = recipeTitle.text , title != "" {
+            let app = UIApplication.shared.delegate as! AppDelegate
             let context = app.managedObjectContext
-            let entity = NSEntityDescription.entityForName("Recipe", inManagedObjectContext: context)!
-            let recipe = Recipe(entity: entity, insertIntoManagedObjectContext: context)
+            let entity = NSEntityDescription.entity(forEntityName: "Recipe", in: context)!
+            let recipe = Recipe(entity: entity, insertInto: context)
             recipe.title = title
             recipe.ingredients = recipeIngredients.text
             recipe.steps = recipeSteps.text
-            recipe.setRecipeImage(recipeImg.image!)
-            context.insertObject(recipe)
+            recipe.setRecipeImage(img: recipeImg.image!)
+            context.insert(recipe)
             do {
                 try context.save()
             } catch let err as NSError {
                 print(err)
             }
-            self.navigationController?.popViewControllerAnimated(true)
+            self.navigationController?.popViewController(animated: true)
         }
     }
   
